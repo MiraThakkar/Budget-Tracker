@@ -6,6 +6,15 @@ const path = require("path");
 
 const app = express();
 
+var MONGODB_URI = process.env.MONGODB_URL || "mongodb://localhost/budget";
+const options = {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+  family: 4 // Use IPv4, skip trying IPv6
+};
+
+
 app.use(logger("dev"));
 
 app.use(express.urlencoded({ extended: true }));
@@ -13,14 +22,8 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
-const databaseUrl = process.env.MONGODB_URI || "budget";
-const collections = ["transactions"];
+mongoose.connect(MONGODB_URI,options)
 
-const db = mongojs(databaseUrl, collections);
-
-db.on("error", error => {
-  console.log("Database Error:", error);
-});
 app.use(require("./routes/api.js"));
 
 const PORT = process.env.PORT || 3000;
